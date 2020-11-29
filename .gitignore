@@ -1,1 +1,6 @@
 elm
+.idea/
+elm-stuff/
+main.js
+package-lock.json
+node_modules/
