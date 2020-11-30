@@ -1,18 +1,27 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
   <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>elm-css example!</title>
     <script type="text/javascript" src="main.js"></script>
     <style>
-      body { background-color: rgb(12, 12, 24); }
+      body {
+        background: repeating-linear-gradient(
+          #300 0px,
+          #300 1px,
+          #300 1px,
+          #210 2px,
+          #210 2px,
+          #210 3px
+        );
+      }
     </style>
   </head>
 
   <body>
     <div id="app"></div>
     <script type="text/javascript">
-      Elm.Main.init({node: document.getElementById("app")});
+      Elm.Main.init({ node: document.getElementById("app") });
     </script>
   </body>
 </html>

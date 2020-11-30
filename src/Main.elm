@@ -66,8 +66,8 @@ view : Model -> Html Msg
 view model =
     div
         [ css
-            [ backgroundColor (hex "ff0")
-            , height (pct 100)
+            [ backgroundColor (hex "ffffff")
+            , padding (px 10)
             ]
         ]
         [ div []
