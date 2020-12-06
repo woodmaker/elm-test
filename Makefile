@@ -24,7 +24,8 @@ help:
 	@echo 'basic targets:'
 	@echo ' - help         - this help'
 	@echo ' - build        - deployable build of this app'
-	@echo ' - clean        - clear this dir'
+	@echo ' - clean        - remove build artifacts'
+	@echo ' - purge        - more clean'
 	@echo 'misc. targets:'
 	@echo ' - install-elm  - *install elm into your system'
 	@echo ' - install-deps - *install apache2 and configure it to be able to host this app'
@@ -33,14 +34,18 @@ help:
 	@echo '                - requires install-deps'
 
 build: main.js index.html
-	mkdir build
+	mkdir -p build
+	touch build
 	cp index.html build/
 	cp main.js build/
 
 clean:
-	rm -Rf elm
 	rm -Rf build
 	rm -f main.js
+
+purge: clean
+	rm -f elm
+	rm -Rf elm-stuff
 	rm -Rf node_modules
 	rm -f package-lock.json
 
