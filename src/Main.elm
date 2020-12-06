@@ -67,7 +67,7 @@ view model =
     div
         [ css
             [ backgroundColor (hex "ffffff")
-            , padding (px 10)
+            , padding (px 60)
             ]
         ]
         [ div []
