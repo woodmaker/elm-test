@@ -1,6 +1,6 @@
 .PHONY: clean install-elm install-dependencies deploy default help
 
-default: help
+default: deploy
 
 
 
