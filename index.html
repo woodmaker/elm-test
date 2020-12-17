@@ -1,27 +1,22 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>elm-css example!</title>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8"/>
+    <title>u micky</title>
     <script type="text/javascript" src="main.js"></script>
     <style>
-      body {
-        background: repeating-linear-gradient(
-          #300 0px,
-          #300 1px,
-          #300 1px,
-          #210 2px,
-          #210 2px,
-          #210 3px
-        );
-      }
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: black;
+            }
+        }
     </style>
-  </head>
+</head>
 
-  <body>
-    <div id="app"></div>
-    <script type="text/javascript">
-      Elm.Main.init({ node: document.getElementById("app") });
-    </script>
-  </body>
+<body>
+<div id="app"></div>
+<script type="text/javascript">
+    Elm.Main.init({node: document.getElementById("app")});
+</script>
+</body>
 </html>

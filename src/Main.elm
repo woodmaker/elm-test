@@ -8,35 +8,18 @@ module Main exposing (..)
 -- import Html
 
 import Browser
+import Browser.Navigation as Nav
 import Css exposing (..)
+import Html
 import Html.Styled exposing (..)
 import Html.Styled.Attributes exposing (css)
 import Html.Styled.Events exposing (onClick)
+import Url
 
 
 
--- MAIN
 
 
-main =
-    Browser.sandbox
-        { init = init
-        , view = view >> toUnstyled
-        , update = update
-        }
-
-
-
--- MODEL
-
-
-type alias Model =
-    Int
-
-
-init : Model
-init =
-    0
 
 
 
@@ -44,35 +27,95 @@ init =
 
 
 type Msg
-    = Increment
-    | Decrement
+    = LinkClicked Browser.UrlRequest
+    | UrlChanged Url.Url
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Increment ->
-            model + 1
+        LinkClicked urlRequest ->
+            case urlRequest of
+                Browser.Internal url ->
+                    ( model, Nav.pushUrl model.key (Url.toString url) )
 
-        Decrement ->
-            model - 1
+                Browser.External href ->
+                    ( model, Nav.load href )
+
+        UrlChanged url ->
+            ( { model | url = url }
+            , Cmd.none
+            )
+
+
+
+-- SUBSCRIPTIONS
+
+
+subscriptions : Model -> Sub Msg
+subscriptions _ =
+    Sub.none
 
 
 
 -- VIEW
 
 
-view : Model -> Html Msg
+view : Model -> Browser.Document Msg
 view model =
+    { title = "URL Interceptor"
+    , body =
+        [ (content >> toUnstyled) model
+        ]
+    }
+
+
+content : Model -> Html Msg
+content model =
     div
         [ css
             [ backgroundColor (hex "ffffff")
-            , padding (px 60)
+            , padding (px 7)
             ]
         ]
         [ div []
-            [ button [ onClick Decrement ] [ text "-" ]
-            , div [] [ text (String.fromInt model) ]
-            , button [ onClick Increment ] [ text "+" ]
+            [ div [] [ text (Url.toString model.url) ]
             ]
         ]
+
+
+
+-- MODEL
+
+
+type Route
+    = Home
+    | Author
+
+
+type alias Model =
+    { key : Nav.Key
+    , url : Url.Url
+    , route : Route
+    }
+
+
+init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
+init flags url key =
+    ( Model key url Home, Cmd.none )
+
+
+
+-- MAIN
+
+
+main : Program () Model Msg
+main =
+    Browser.application
+        { init = init
+        , view = view
+        , update = update
+        , subscriptions = subscriptions
+        , onUrlChange = UrlChanged
+        , onUrlRequest = LinkClicked
+        }
