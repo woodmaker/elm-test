@@ -1,25 +1,38 @@
 module Main exposing (..)
 
--- Press buttons to increment and decrement a counter.
---
--- Read how it works:
---   https://guide.elm-lang.org/architecture/buttons.html
---
--- import Html
-
 import Browser
 import Browser.Navigation as Nav
 import Css exposing (..)
-import Html
 import Html.Styled exposing (..)
-import Html.Styled.Attributes exposing (css)
-import Html.Styled.Events exposing (onClick)
+import Html.Styled.Attributes exposing (css, href)
 import Url
+import Url.Parser exposing ((</>))
 
 
 
+-- MODEL
 
 
+type Route
+    = Home
+    | Author
+    | Idk
+
+
+type alias Model =
+    { key : Nav.Key
+    , url : Url.Url
+    , route : Route
+    }
+
+
+
+-- INIT
+
+
+init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
+init flags url key =
+    ( Model key url ( routeByUrl url ), Cmd.none )
 
 
 
@@ -31,19 +44,44 @@ type Msg
     | UrlChanged Url.Url
 
 
+routeParser : Url.Parser.Parser ( Route -> a ) a
+routeParser =
+    Url.Parser.oneOf
+        [ Url.Parser.map Home   ( Url.Parser.s "home" )
+        , Url.Parser.map Author ( Url.Parser.s "author" )
+        ]
+
+
+routeByUrl : Url.Url -> Route
+routeByUrl url =
+    case ( Url.Parser.parse routeParser url ) of
+        Nothing -> Idk
+        Just val -> val
+
+routeByString : String -> Route
+routeByString url =
+    case ( Url.fromString url ) of
+        Nothing -> Idk
+        Just val -> routeByUrl val
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         LinkClicked urlRequest ->
             case urlRequest of
                 Browser.Internal url ->
-                    ( model, Nav.pushUrl model.key (Url.toString url) )
+                    ( { model | route = routeByUrl url }
+                    , Nav.pushUrl model.key ( Url.toString url )
+                    )
 
                 Browser.External href ->
-                    ( model, Nav.load href )
+                    ( { model | route = routeByString href }
+                    , Nav.load href
+                    )
 
         UrlChanged url ->
-            ( { model | url = url }
+            ( { model | url = url, route = routeByUrl url }
             , Cmd.none
             )
 
@@ -80,29 +118,16 @@ content model =
         ]
         [ div []
             [ div [] [ text (Url.toString model.url) ]
+            , a [ href "author" ] [ text "about me" ]
+            , text " "
+            , a [ href "home" ] [ text "go home" ]
+            , text " "
+            , case model.route of
+                Home -> text "at home"
+                Author -> text "at author"
+                Idk -> text "at idk"
             ]
         ]
-
-
-
--- MODEL
-
-
-type Route
-    = Home
-    | Author
-
-
-type alias Model =
-    { key : Nav.Key
-    , url : Url.Url
-    , route : Route
-    }
-
-
-init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
-init flags url key =
-    ( Model key url Home, Cmd.none )
 
 
 
