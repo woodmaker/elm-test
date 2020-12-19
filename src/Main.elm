@@ -1,4 +1,4 @@
-module Main exposing (..)
+module Main exposing (main)
 
 import Browser
 import Browser.Navigation as Nav
@@ -8,22 +8,8 @@ import Html.Styled.Attributes exposing (css, href)
 import Url
 import Url.Parser exposing ((</>))
 
-
-
--- MODEL
-
-
-type Route
-    = Home
-    | Author
-    | Idk
-
-
-type alias Model =
-    { key : Nav.Key
-    , url : Url.Url
-    , route : Route
-    }
+import Router exposing (routeByString, routeByUrl)
+import Models exposing (Model, Route(..))
 
 
 
@@ -32,7 +18,7 @@ type alias Model =
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key =
-    ( Model key url ( routeByUrl url ), Cmd.none )
+    ( Model key ( routeByUrl url ), Cmd.none )
 
 
 
@@ -42,27 +28,6 @@ init flags url key =
 type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
-
-
-routeParser : Url.Parser.Parser ( Route -> a ) a
-routeParser =
-    Url.Parser.oneOf
-        [ Url.Parser.map Home   ( Url.Parser.s "home" )
-        , Url.Parser.map Author ( Url.Parser.s "author" )
-        ]
-
-
-routeByUrl : Url.Url -> Route
-routeByUrl url =
-    case ( Url.Parser.parse routeParser url ) of
-        Nothing -> Idk
-        Just val -> val
-
-routeByString : String -> Route
-routeByString url =
-    case ( Url.fromString url ) of
-        Nothing -> Idk
-        Just val -> routeByUrl val
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -81,7 +46,7 @@ update msg model =
                     )
 
         UrlChanged url ->
-            ( { model | url = url, route = routeByUrl url }
+            ( { model | route = routeByUrl url }
             , Cmd.none
             )
 
@@ -99,34 +64,60 @@ subscriptions _ =
 -- VIEW
 
 
+type alias StyledDocument =
+    { title : String
+    , body : Html Msg
+    }
+
+
+
 view : Model -> Browser.Document Msg
 view model =
     { title = "URL Interceptor"
     , body =
-        [ (content >> toUnstyled) model
-        ]
+        [ ( content >> toUnstyled ) model ]
     }
-
 
 content : Model -> Html Msg
 content model =
     div
         [ css
-            [ backgroundColor (hex "ffffff")
-            , padding (px 7)
+            [ backgroundColor ( hex "fff" )
+            , padding ( px 7 )
             ]
         ]
-        [ div []
-            [ div [] [ text (Url.toString model.url) ]
-            , a [ href "author" ] [ text "about me" ]
-            , text " "
-            , a [ href "home" ] [ text "go home" ]
-            , text " "
-            , case model.route of
-                Home -> text "at home"
-                Author -> text "at author"
-                Idk -> text "at idk"
+        [ menu model
+        , siteContent model
+        ]
+
+menu : Model -> Html Msg
+menu model =
+    nav []
+        [ ul []
+        -- TODO make this into some generated list
+        -- maybe put "at micka" aside, non-clickable
+            [ li []
+                [ a
+                    [ href "home" ]
+                    [ text "at micka" ]
+                ]
+            , li []
+                [ a
+                    [ href "about" ]
+                    [ text "about" ]
+                ]
             ]
+        ]
+
+
+siteContent : Model -> Html Msg
+siteContent model =
+    p
+        []
+        [ case model.route of
+            Home -> text "at home"
+            About -> text "at about"
+            E404 -> text "at idk"
         ]
 
 
