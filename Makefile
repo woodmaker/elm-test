@@ -12,7 +12,7 @@ elm:
 	gunzip elm.gz
 	chmod +x elm
 
-main.js: elm src/Main.elm
+main.js: elm src/*
 	./elm make --output main.js src/Main.elm
 
 
