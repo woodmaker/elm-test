@@ -1,19 +1,4 @@
-.PHONY: clean install-elm install-dependencies deploy default help
-
-default: deploy
-
-
-
-# internal targets
-
-
-elm:
-	curl -L -o elm.gz https://github.com/elm/compiler/releases/download/0.19.1/binary-for-linux-64-bit.gz
-	gunzip elm.gz
-	chmod +x elm
-
-main.js: elm src/*
-	./elm make --output main.js src/Main.elm
+.PHONY: clean install-elm install-deps deploy default help
 
 
 
@@ -33,15 +18,18 @@ help:
 	@echo ' - deploy       - provide (cp) build of this app to apache'
 	@echo '                - requires install-deps'
 
+
 build: main.js index.html
 	mkdir -p build
 	touch build
 	cp index.html build/
 	cp main.js build/
 
+
 clean:
 	rm -Rf build
 	rm -f main.js
+
 
 purge: clean
 	rm -f elm
@@ -57,12 +45,15 @@ purge: clean
 deploy: build
 	cp build/* /var/www/html/
 
+
 /usr/local/bin/elm: elm
 	cp elm /usr/local/bin
 
+
 install-elm: /usr/local/bin/elm
 
-install-dependencies:
+
+install-deps:
 	@echo install and configure apache2 to be able to provide build of this app
 	@echo this target could break your computer configuration.
 	@echo Please review this target in Makefile.
@@ -72,4 +63,17 @@ install-dependencies:
 	chmod -R 777 /var/www/html 
 	/etc/init.d/apache2 restart
 
+
+
+# internal targets
+
+
+elm:
+	wget -O elm.gz https://github.com/elm/compiler/releases/download/0.19.1/binary-for-linux-64-bit.gz
+	gunzip elm.gz
+	chmod +x elm
+
+
+main.js: elm src/*
+	./elm make --output main.js src/Main.elm
 
