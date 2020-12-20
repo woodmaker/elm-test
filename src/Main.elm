@@ -6,19 +6,44 @@ import Css exposing (..)
 import Html.Styled exposing (..)
 import Html.Styled.Attributes exposing (css, href)
 import Url
-import Url.Parser exposing ((</>))
 
 import Router exposing (routeByString, routeByUrl)
-import Models exposing (Model, Route(..))
+import Models exposing (Model, Route(..), Theme)
+
+
+-- tick related theme update
+
+
+
+import Time
+import Task
+
+
+
+
+
 
 
 
 -- INIT
 
+appTheme : Theme
+appTheme =
+    { fg = rgb 255 255 255
+    , bg = rgb 0 0 0
+    }
+
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key =
-    ( Model key ( routeByUrl url ), Cmd.none )
+    ( Model
+        key
+        ( routeByUrl url )
+        appTheme
+        Time.utc
+        ( Time.millisToPosix 0 )
+    , Task.perform AdjustTimeZone Time.here
+    )
 
 
 
@@ -28,6 +53,8 @@ init flags url key =
 type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
+    | Tick Time.Posix
+    | AdjustTimeZone Time.Zone
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -50,6 +77,27 @@ update msg model =
             , Cmd.none
             )
 
+        Tick now ->
+            ( { model
+                | theme =
+                  { fg = rgb
+                    (64 - 24 + (Time.toHour model.zone now))
+                    (10*(Time.toHour model.zone now))
+                    (10*(Time.toHour model.zone now))
+                  , bg = rgb 255 255 255
+                  }
+                , time = now
+              }
+            , Cmd.none
+            )
+
+        AdjustTimeZone zone ->
+          ( { model
+              | zone = zone
+            }
+          , Cmd.none
+          )
+
 
 
 -- SUBSCRIPTIONS
@@ -57,7 +105,7 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Sub.none
+    Time.every 1000 Tick
 
 
 
@@ -73,7 +121,7 @@ type alias StyledDocument =
 
 view : Model -> Browser.Document Msg
 view model =
-    { title = "URL Interceptor"
+    { title = "@micka"
     , body =
         [ ( content >> toUnstyled ) model ]
     }
@@ -82,7 +130,8 @@ content : Model -> Html Msg
 content model =
     div
         [ css
-            [ backgroundColor ( hex "fff" )
+            [ backgroundColor model.theme.bg
+            , color model.theme.fg
             , padding ( px 7 )
             ]
         ]
@@ -92,23 +141,16 @@ content model =
 
 menu : Model -> Html Msg
 menu model =
-    nav []
-        [ ul []
-        -- TODO make this into some generated list
-        -- maybe put "at micka" aside, non-clickable
-            [ li []
-                [ a
-                    [ href "home" ]
-                    [ text "at micka" ]
-                ]
-            , li []
-                [ a
-                    [ href "about" ]
-                    [ text "about" ]
-                ]
-            ]
+    p []
+        [ b []
+            [ text "at micka" ]
+        , text " "
+        , a [ href "articles" ]
+            [ text "articles" ]
+        , text " "
+        , a [ href "about" ]
+            [ text "about" ]
         ]
-
 
 siteContent : Model -> Html Msg
 siteContent model =
@@ -118,6 +160,11 @@ siteContent model =
             Home -> text "at home"
             About -> text "at about"
             E404 -> text "at idk"
+        , text
+          ( ( String.fromInt ( Time.toHour model.zone model.time ) )
+            ++ ":"
+            ++ ( String.fromInt ( Time.toMinute model.zone model.time ) )
+          )
         ]
 
 
