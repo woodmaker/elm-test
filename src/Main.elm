@@ -15,10 +15,6 @@ import Time
 import Task
 
 
--- tick related theme update
-
-
-
 
 
 
@@ -99,6 +95,7 @@ update msg model =
         }
       , Cmd.none
       )
+
 
 
 
