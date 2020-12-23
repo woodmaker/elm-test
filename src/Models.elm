@@ -1,9 +1,9 @@
 module Models exposing (..)
+
 import Browser.Navigation
 import Css exposing (Color)
+import Themer exposing (Theme)
 import Time
-
-
 
 
 type alias Model =
@@ -15,16 +15,7 @@ type alias Model =
     }
 
 
-type alias Theme =
-    { fg : Color
-    , bg : Color
-    }
-
-
-
 type Route
     = Home
     | About
     | E404
-
-

@@ -1,4 +1,4 @@
-.PHONY: clean install-elm install-deps deploy default help
+.PHONY: clean install-elm install-deps deploy default help format
 
 
 
@@ -68,12 +68,21 @@ install-deps:
 # internal targets
 
 
+main.js: elm src/*
+	#make format
+	./elm make --output main.js src/Main.elm
+
+
 elm:
 	wget -O elm.gz https://github.com/elm/compiler/releases/download/0.19.1/binary-for-linux-64-bit.gz
 	gunzip elm.gz
 	chmod +x elm
 
 
-main.js: elm src/*
-	./elm make --output main.js src/Main.elm
+elm-format:
+	wget -O elm-format.tgz https://github.com/avh4/elm-format/releases/download/0.8.4/elm-format-0.8.4-linux-x64.tgz
+	tar xf elm-format.tgz
 
+
+format: elm-format
+	./elm-format --yes src/
