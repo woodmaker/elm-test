@@ -5,3 +5,5 @@ main.js
 package-lock.json
 node_modules/
 build/
+/elm-format
+/elm-format.tgz

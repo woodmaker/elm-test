@@ -15,9 +15,8 @@ type alias Theme =
     }
 
 
-
-theme : Theme
-theme =
+initTheme : Theme
+initTheme =
     { fg = rgb 64 64 64
     , bg = rgb 255 255 255
     , primary = rgb 64 192 255
@@ -27,60 +26,69 @@ theme =
     }
 
 
+offset =
+    { red = 16
+    , green = 8
+    , blue = 0
+    }
 
-xx : Bool -> Int -> Int -> Int
-xx desc hours seconds =
+
+offsetHour : Int -> Int -> Int
+offsetHour colourOffset hour =
+    modBy 24 (hour + (24 - colourOffset))
+
+
+colourChange : Int -> Time.Zone -> Time.Posix -> Int
+colourChange timeOffset zone time =
     let
-        ad =
-            if desc then
-                1
+        hour =
+            offsetHour timeOffset (Time.toHour zone time)
+
+        am =
+            hour < 12
+
+        h =
+            if am then
+                hour
 
             else
-                -1
+                hour - 12
+
+        m =
+            Time.toMinute zone time
+
+        s =
+            Time.toSecond zone time
     in
-    ad * 32 - modBy 450 (hours * 60 * 60 + seconds)
+    if h > 7 then
+        if am then
+            63
 
-
-colourDiff : Int -> Time.Zone -> Time.Posix -> Int
-colourDiff offset zone time =
-    let
-        ch =
-            modBy 24 (24 - offset + Time.toHour zone time)
-
-        cs =
-            Time.toMinute zone time * 60 + Time.toSecond zone time
-    in
-    if List.member ch [ 0, 1, 2, 3, 4, 5, 6, 7 ] then
-        xx True ch cs
-
-    else if List.member ch [ 8, 9, 10, 11 ] then
-        -32
-
-    else if List.member ch [ 12, 13, 14, 15, 16, 17, 18, 19 ] then
-        xx False (ch - 12) cs
+        else
+            0
 
     else
-        32
+        8 * (h + 1) + (m * 60 + s + 1) // 450 - 1
 
 
 themeUpdate : Time.Zone -> Time.Posix -> Theme
 themeUpdate zone time =
     let
         rd =
-            colourDiff 2 zone time
+            colourChange offset.red zone time
 
         gd =
-            colourDiff 18 zone time
+            colourChange offset.green zone time
 
         bd =
-            colourDiff 10 zone time
+            colourChange offset.blue zone time
     in
     { fg = rgb 64 64 64
     , bg = rgb 255 255 255
     , primary = rgb 64 192 255
-    , fgDark = rgb (191 + rd) (191 + gd) (191 + bd)
-    , bgDark = rgb (31 + rd) (31 + gd) (31 + bd)
-    , primaryDark = rgb (31 + rd) (192 + gd) (223 + bd)
+    , fgDark = rgb (192 + rd) (192 + gd) (192 + bd)
+    , bgDark = rgb (32 + rd) (32 + gd) (32 + bd)
+    , primaryDark = rgb (32 + rd) (192 + gd) (224 + bd)
     }
 
 

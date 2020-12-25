@@ -3,13 +3,12 @@ module Main exposing (main)
 import Browser
 import Browser.Navigation as Nav
 import Css exposing (..)
-import Css.Media exposing (withMedia)
 import Html.Styled exposing (..)
 import Html.Styled.Attributes exposing (css, href)
 import Models exposing (Model, Route(..))
 import Router exposing (routeByString, routeByUrl)
 import Task
-import Themer exposing (theme, themeUpdate)
+import Themer exposing (initTheme, themeUpdate)
 import Time
 import Url
 
@@ -23,7 +22,7 @@ init flags url key =
     ( Model
         key
         (routeByUrl url)
-        theme
+        initTheme
         Time.utc
         (Time.millisToPosix 0)
     , Task.perform AdjustTimeZone Time.here
@@ -73,7 +72,7 @@ update msg model =
             ( { model
                 | zone = zone
               }
-            , Cmd.none
+            , Task.perform Tick Time.now
             )
 
 
