@@ -9,7 +9,7 @@ import Html.Styled.Attributes exposing (css, href)
 import Models exposing (Model, Route(..))
 import Router exposing (routeByString, routeByUrl)
 import Task
-import Themer exposing (initTheme, themeUpdate)
+import Themer exposing (initTheme, updateTheme)
 import Time
 import Url
 
@@ -63,7 +63,7 @@ update msg model =
 
         Tick now ->
             ( { model
-                | theme = themeUpdate model.zone now
+                | theme = updateTheme model.zone now
                 , time = now
               }
             , Cmd.none

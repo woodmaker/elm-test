@@ -1,4 +1,7 @@
-module CssMediaDarkMode exposing (prefersColorScheme, dark, light, cssDark)
+module CssMediaDarkMode exposing
+    ( cssDark
+    , dark, light, prefersColorScheme
+    )
 
 {-| ['prefers-color-scheme'](https://www.w3.org/TR/mediaqueries-5/#prefers-color-scheme) extension of Css.Media for dark mode support.
 
@@ -9,49 +12,49 @@ module CssMediaDarkMode exposing (prefersColorScheme, dark, light, cssDark)
 
 # Basic Usage
 
-import Css.Media exposing (withMedia, only, screen)
-import Css exposing (css, color, backgroundColor, rgb)
-import Html.Styled exposing (div, text)
-import CssMediaDarkMode exposing (prefersColorScheme, dark)
+    import Css exposing (backgroundColor, color, css, rgb)
+    import Css.Media exposing (only, screen, withMedia)
+    import CssMediaDarkMode exposing (dark, prefersColorScheme)
+    import Html.Styled exposing (div, text)
 
-content : Html Msg
-content =
-    div
-        [ css
-            [ color (rgb 0 0 255)
-            , backgroundColor (rgb 255 255 255)
-            , withMedia
-                [ only
-                    screen
-                    [ prefersColorScheme dark ]
-                ]
-                [ color (rgb 255 255 0)
-                , backgroundColor (rgb 0 0 0)
+    content : Html Msg
+    content =
+        div
+            [ css
+                [ color (rgb 0 0 255)
+                , backgroundColor (rgb 255 255 255)
+                , withMedia
+                    [ only
+                        screen
+                        [ prefersColorScheme dark ]
+                    ]
+                    [ color (rgb 255 255 0)
+                    , backgroundColor (rgb 0 0 0)
+                    ]
                 ]
             ]
-        ]
-        [ text "I am yellow in dark mode and blue in light mode" ]
+            [ text "I am yellow in dark mode and blue in light mode" ]
 
 
 # Usage with cssDark function
 
-import Css exposing (css, color, backgroundColor, rgb)
-import Html.Styled exposing (div, text)
-import CssMediaDarkMode exposing (cssDark)
+    import Css exposing (backgroundColor, color, css, rgb)
+    import CssMediaDarkMode exposing (cssDark)
+    import Html.Styled exposing (div, text)
 
-content : Html Msg
-content =
-    div
-        [ css
-            [ color (rgb 0 0 255)
-            , backgroundColor (rgb 255 255 255)
-            , cssDark
-                [ color (rgb 255 255 0)
-                , backgroundColor (rgb 0 0 0)
+    content : Html Msg
+    content =
+        div
+            [ css
+                [ color (rgb 0 0 255)
+                , backgroundColor (rgb 255 255 255)
+                , cssDark
+                    [ color (rgb 255 255 0)
+                    , backgroundColor (rgb 0 0 0)
+                    ]
                 ]
             ]
-        ]
-        [ text "I am yellow in dark mode and blue in light mode" ]
+            [ text "I am yellow in dark mode and blue in light mode" ]
 
 -}
 
@@ -96,6 +99,7 @@ prefersColorScheme value =
 {-| helper function for applying dark mode
 
 See example on top of this file.
+
 -}
 cssDark : List Css.Style -> Css.Style
 cssDark styles =
@@ -107,10 +111,13 @@ cssDark styles =
         styles
 
 
+
 {- Copy of not exported helper functions from Css.Media -}
+
 
 type Compatible
     = Compatible
+
 
 feature : String -> Css.Value a -> Expression
 feature key { value } =
