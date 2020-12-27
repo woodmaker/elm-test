@@ -1,7 +1,6 @@
 module Models exposing (..)
 
 import Browser.Navigation
-import Css exposing (Color)
 import Themer exposing (Theme)
 import Time
 
