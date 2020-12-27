@@ -59,7 +59,7 @@ install-deps:
 	@echo Please review this target in Makefile.
 	apt-get update
 	apt-get install apache2
-	cp etc/apache2.conf /etc/apache2/apace2.conf
+	cp etc/apache2.conf /etc/apache2/apache2.conf
 	chmod -R 777 /var/www/html 
 	/etc/init.d/apache2 restart
 
