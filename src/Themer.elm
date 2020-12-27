@@ -1,7 +1,6 @@
-module Themer exposing (..)
+module Themer exposing (Theme, initTheme, themeUpdate)
 
 import Css exposing (Color, Compatible, Style, Value, rgb)
-import Css.Media exposing (Expression, withMedia)
 import Time
 
 
@@ -90,60 +89,3 @@ themeUpdate zone time =
     , bgDark = rgb (32 + rd) (32 + gd) (32 + bd)
     , primaryDark = rgb (32 + rd) (192 + gd) (224 + bd)
     }
-
-
-cssDark : List Style -> Style
-cssDark styles =
-    withMedia
-        [ Css.Media.only
-            Css.Media.screen
-            [ prefersColorScheme dark ]
-        ]
-        styles
-
-
-{-| Css.Media -like implementation of dark mode
--}
-type Compatible
-    = Compatible
-
-
-type alias PrefersColorScheme a =
-    { a | value : String, prefersColorScheme : Compatible }
-
-
-{-| -}
-type alias Dark =
-    { value : String, prefersColorScheme : Compatible }
-
-
-{-| -}
-type alias Light =
-    { value : String, prefersColorScheme : Compatible }
-
-
-{-| CSS value [`landscape`](https://drafts.csswg.org/mediaqueries/#valdef-media-orientation-portrait)
--}
-dark : Dark
-dark =
-    { value = "dark", prefersColorScheme = Compatible }
-
-
-{-| CSS value [`portrait`](https://drafts.csswg.org/mediaqueries/#valdef-media-orientation-portrait)
--}
-light : Light
-light =
-    { value = "light", prefersColorScheme = Compatible }
-
-
-{-| Media feature [`prefers-color-scheme`](https://drafts.csswg.org/mediaqueries/#orientation).
-Accepts `portrait` or `landscape`.
--}
-prefersColorScheme : PrefersColorScheme a -> Expression
-prefersColorScheme value =
-    feature "prefers-color-scheme" value
-
-
-feature : String -> Value a -> Expression
-feature key { value } =
-    { feature = key, value = Just value }

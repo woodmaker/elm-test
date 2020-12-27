@@ -3,6 +3,7 @@ module Main exposing (main)
 import Browser
 import Browser.Navigation as Nav
 import Css exposing (..)
+import CssMediaDarkMode exposing (cssDark)
 import Html.Styled exposing (..)
 import Html.Styled.Attributes exposing (css, href)
 import Models exposing (Model, Route(..))
@@ -110,7 +111,7 @@ content model =
             [ color model.theme.fg
             , backgroundColor model.theme.bg
             , padding (px 7)
-            , Themer.cssDark
+            , cssDark
                 [ color model.theme.fgDark
                 , backgroundColor model.theme.bgDark
                 ]
@@ -125,7 +126,7 @@ menuLink : Themer.Theme -> Style
 menuLink theme =
     Css.batch
         [ color theme.primary
-        , Themer.cssDark [ color theme.primaryDark ]
+        , cssDark [ color theme.primaryDark ]
         , textDecoration none
         , hover [ textDecoration underline ]
         ]
