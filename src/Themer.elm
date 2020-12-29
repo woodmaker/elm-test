@@ -76,10 +76,10 @@ updateTheme zone time =
     in
     { fg = rgb 64 64 64
     , bg = rgb 255 255 255
-    , primary = rgb 64 192 255
-    , fgDark = rgb (192 + rd) (192 + gd) (192 + bd)
-    , bgDark = rgb (32 + rd) (32 + gd) (32 + bd)
-    , primaryDark = rgb (32 + rd) (192 + gd) (224 + bd)
+    , primary = rgb (64 + rd) (64 + gd) (64 + bd)
+    , fgDark = rgb 224 224 224
+    , bgDark = rgb 48 48 48
+    , primaryDark = rgb (128 + rd) (128 + gd) (128 + bd)
     }
 
 

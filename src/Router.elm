@@ -8,8 +8,9 @@ import Url.Parser
 routeParser : Url.Parser.Parser (Route -> a) a
 routeParser =
     Url.Parser.oneOf
-        [ Url.Parser.map Home (Url.Parser.s "home")
+        [ Url.Parser.map Articles (Url.Parser.s "articles")
         , Url.Parser.map About (Url.Parser.s "about")
+        , Url.Parser.map Articles Url.Parser.top
         ]
 
 

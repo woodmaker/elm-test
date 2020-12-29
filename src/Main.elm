@@ -46,10 +46,9 @@ init flags url key =
 
 
 -- UPDATE
-
-
-
 -- TODO: move to Controller.elm
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -103,4 +102,3 @@ type alias StyledDocument =
     { title : String
     , body : Html Msg
     }
-

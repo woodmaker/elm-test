@@ -1,15 +1,13 @@
 module View exposing (view)
 
-
 import Browser
 import Css exposing (..)
+import CssMediaDarkMode exposing (cssDark)
 import Html.Styled exposing (..)
 import Html.Styled.Attributes exposing (css, href)
-import CssMediaDarkMode exposing (cssDark)
 import Models exposing (Model, Msg, Route(..))
 import Themer
 import Time
-
 
 
 view : Model -> Browser.Document Msg
@@ -27,6 +25,9 @@ content model =
             [ color model.theme.fg
             , backgroundColor model.theme.bg
             , padding (px 7)
+            , maxWidth (px 800)
+            , marginLeft auto
+            , marginRight auto
             , cssDark
                 [ color model.theme.fgDark
                 , backgroundColor model.theme.bgDark
@@ -51,7 +52,9 @@ menuLink theme =
 menuLinkSelected : Themer.Theme -> Style
 menuLinkSelected theme =
     Css.batch
-        [ textDecoration2 underline dashed ]
+        [ menuLink theme
+        , textDecoration underline
+        ]
 
 
 menu : Model -> Html Msg
@@ -59,20 +62,37 @@ menu model =
     let
         link =
             menuLink model.theme
-        selected =
+
+        selectedLink =
             menuLinkSelected model.theme
     in
     p []
         [ b []
-            [ text "at micka" ]
+            [ text "u micky" ]
         , text " - "
         , a
-            [ href "articles", css [ link ] ]
-            [ text "articles" ]
+            [ href "articles"
+            , css
+                [ if model.route == Articles then
+                    selectedLink
+
+                  else
+                    link
+                ]
+            ]
+            [ text "věci" ]
         , text ", "
         , a
-            [ href "about", css [ link ] ]
-            [ text "about" ]
+            [ href "about"
+            , css
+                [ if model.route == About then
+                    selectedLink
+
+                  else
+                    link
+                ]
+            ]
+            [ text "o mně" ]
         ]
 
 
@@ -80,24 +100,12 @@ siteContent : Model -> Html Msg
 siteContent model =
     p []
         [ case model.route of
-            Home ->
-                text "at home"
+            Articles ->
+                text "at articles"
 
             About ->
-                text "at about"
+                text "Jsem micka a jsem linej pouzivat diakritiku."
 
             E404 ->
-                text "at idk"
-        , text
-            (String.fromInt (Time.toHour model.zone model.time)
-                ++ ":"
-                ++ String.fromInt (Time.toMinute model.zone model.time)
-            )
-        , div []
-            [ text (String.fromInt model.theme.fgDark.red)
-            , text " "
-            , text (String.fromInt model.theme.fgDark.green)
-            , text " "
-            , text (String.fromInt model.theme.fgDark.blue)
-            ]
+                text "404 ... asi nevim kde jsem"
         ]

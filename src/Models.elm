@@ -9,6 +9,8 @@ import Url
 
 
 -- TODO: move to Controller.elm maybe
+
+
 type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
@@ -26,6 +28,6 @@ type alias Model =
 
 
 type Route
-    = Home
+    = Articles
     | About
     | E404
