@@ -2,16 +2,30 @@ module Main exposing (main)
 
 import Browser
 import Browser.Navigation as Nav
-import Css exposing (..)
-import CssMediaDarkMode exposing (cssDark)
 import Html.Styled exposing (..)
-import Html.Styled.Attributes exposing (css, href)
-import Models exposing (Model, Route(..))
+import Models exposing (Model, Msg(..), Route(..))
 import Router exposing (routeByString, routeByUrl)
 import Task
 import Themer exposing (initTheme, updateTheme)
 import Time
 import Url
+import View exposing (view)
+
+
+
+-- MAIN
+
+
+main : Program () Model Msg
+main =
+    Browser.application
+        { init = init
+        , view = view
+        , update = update
+        , subscriptions = subscriptions
+        , onUrlChange = UrlChanged
+        , onUrlRequest = LinkClicked
+        }
 
 
 
@@ -34,13 +48,8 @@ init flags url key =
 -- UPDATE
 
 
-type Msg
-    = LinkClicked Browser.UrlRequest
-    | UrlChanged Url.Url
-    | Tick Time.Posix
-    | AdjustTimeZone Time.Zone
 
-
+-- TODO: move to Controller.elm
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -95,101 +104,3 @@ type alias StyledDocument =
     , body : Html Msg
     }
 
-
-view : Model -> Browser.Document Msg
-view model =
-    { title = "@micka"
-    , body =
-        [ (content >> toUnstyled) model ]
-    }
-
-
-content : Model -> Html Msg
-content model =
-    div
-        [ css
-            [ color model.theme.fg
-            , backgroundColor model.theme.bg
-            , padding (px 7)
-            , cssDark
-                [ color model.theme.fgDark
-                , backgroundColor model.theme.bgDark
-                ]
-            ]
-        ]
-        [ menu model
-        , siteContent model
-        ]
-
-
-menuLink : Themer.Theme -> Style
-menuLink theme =
-    Css.batch
-        [ color theme.primary
-        , cssDark [ color theme.primaryDark ]
-        , textDecoration none
-        , hover [ textDecoration underline ]
-        ]
-
-
-menu : Model -> Html Msg
-menu model =
-    let
-        link =
-            menuLink model.theme
-    in
-    p []
-        [ b []
-            [ text "at micka" ]
-        , text " "
-        , a
-            [ href "articles", css [ link ] ]
-            [ text "articles" ]
-        , text " "
-        , a
-            [ href "about", css [ link ] ]
-            [ text "about" ]
-        ]
-
-
-siteContent : Model -> Html Msg
-siteContent model =
-    p []
-        [ case model.route of
-            Home ->
-                text "at home"
-
-            About ->
-                text "at about"
-
-            E404 ->
-                text "at idk"
-        , text
-            (String.fromInt (Time.toHour model.zone model.time)
-                ++ ":"
-                ++ String.fromInt (Time.toMinute model.zone model.time)
-            )
-        , div []
-            [ text (String.fromInt model.theme.fgDark.red)
-            , text " "
-            , text (String.fromInt model.theme.fgDark.green)
-            , text " "
-            , text (String.fromInt model.theme.fgDark.blue)
-            ]
-        ]
-
-
-
--- MAIN
-
-
-main : Program () Model Msg
-main =
-    Browser.application
-        { init = init
-        , view = view
-        , update = update
-        , subscriptions = subscriptions
-        , onUrlChange = UrlChanged
-        , onUrlRequest = LinkClicked
-        }

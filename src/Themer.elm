@@ -110,14 +110,14 @@ offsetHour colourOffset hour =
 
 We change color with offset to be able to apply the same color value formula.
 
-     h  V     Value
-     2  .\..  21
-     6  ..\.  42
-    10  ...|  63
-    14  ../.  42
-    18  ./..  21
-    22  |...  0
-     2  .\..  21
+    hour  Value
+       2  .\..  21
+       6  ..\.  42
+    8-12  ...|  63
+      14  ../.  42
+      18  ./..  21
+    20-0  |...  0
+       2  .\..  21
 
   - 0:00 - 7:59 am it's raising.
   - 8:00 - 11:59 am it's up on 63.
