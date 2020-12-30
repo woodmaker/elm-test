@@ -80,7 +80,10 @@ updateTheme zone time =
     , primary = rgb (rd*4) (gd*2) (bd*4)
     , fgDark = rgb 224 224 224
     , bgDark = rgb 48 48 48
-    , primaryDark = rgb (primDarkBase + rd*3) (primDarkBase + gd*3) (primDarkBase + bd*3)
+    , primaryDark = rgb
+        (63 + (rd+1)*3)
+        (63 + (gd+1)*3)
+        (63 + (bd+1)*3)
     }
 
 
@@ -104,7 +107,7 @@ offsetHour 16 18 = 2
 -}
 offsetHour : Int -> Int -> Int
 offsetHour colourOffset hour =
-    modBy 24 (hour + (24 - colourOffset))
+    modBy 24 (hour + 24 - colourOffset)
 
 
 {-| Transforms time+offset into a color value.
@@ -158,7 +161,10 @@ colorChange timeOffset zone time =
             0
 
     else
-        8 * (h + 1) + (m * 60 + s + 1) // 450 - 1
+        if am then
+            8 * h + (m * 60 + s) // 450
+        else
+            8 * (7 - h) + (7 - (m * 60 + s)//450)
 
 
 
