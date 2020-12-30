@@ -73,14 +73,14 @@ updateTheme zone time =
 
         bd =
             colorChange offset.blue zone time
-        primDarkBase = 128
+        primDarkBase = 64
     in
     { fg = rgb 64 64 64
     , bg = rgb 255 255 255
     , primary = rgb (rd*4) (gd*2) (bd*4)
     , fgDark = rgb 224 224 224
     , bgDark = rgb 48 48 48
-    , primaryDark = rgb (primDarkBase + rd*4) (primDarkBase + gd*4) (primDarkBase + bd*4)
+    , primaryDark = rgb (primDarkBase + rd*3) (primDarkBase + gd*3) (primDarkBase + bd*3)
     }
 
 
