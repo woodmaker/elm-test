@@ -19,10 +19,11 @@ help:
 	@echo '                - requires install-deps'
 
 
-build: main.js index.html
+build: main.js index.html articles.txt
 	mkdir -p build
 	touch build
 	cp index.html build/
+	cp articles.txt build/
 	cp main.js build/
 
 

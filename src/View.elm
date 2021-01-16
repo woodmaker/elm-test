@@ -3,44 +3,62 @@ module View exposing (view)
 import Browser
 import Css exposing (..)
 import CssMediaDarkMode exposing (cssDark)
+import Html.Lazy exposing (lazy)
 import Html.Styled exposing (..)
 import Html.Styled.Attributes exposing (css, href)
-import Models exposing (Model, Msg, Route(..))
-import Themer
-import Time
+import Model exposing (Article, Model, Msg, Route(..))
+import Themer exposing (Theme)
+
+
+type alias Props =
+    { route : Route
+    , theme : Theme
+    , content : Maybe String
+    , article : Article
+    }
 
 
 view : Model -> Browser.Document Msg
 view model =
+    browserApp
+        { route = model.route
+        , theme = model.theme
+        , content = model.content
+        , article = model.article
+        }
+
+
+browserApp : Props -> Browser.Document Msg
+browserApp props =
     { title = "@micka"
     , body =
-        [ (content >> toUnstyled) model ]
+        [ lazy (bodyLayout >> toUnstyled) props ]
     }
 
 
-content : Model -> Html Msg
-content model =
+bodyLayout : Props -> Html Msg
+bodyLayout props =
     div
         [ css
-            [ color model.theme.fg
-            , backgroundColor model.theme.bg
+            [ color props.theme.fg
+            , backgroundColor props.theme.bg
             , padding (px 7)
             , maxWidth (px 800)
             , marginLeft auto
             , marginRight auto
             , cssDark
-                [ color model.theme.fgDark
-                , backgroundColor model.theme.bgDark
+                [ color props.theme.fgDark
+                , backgroundColor props.theme.bgDark
                 ]
             ]
         ]
-        [ menu model
-        , siteContent model
+        [ menu props
+        , sectionContent props
         ]
 
 
-menuLink : Themer.Theme -> Style
-menuLink theme =
+linkStyle : Themer.Theme -> Style
+linkStyle theme =
     Css.batch
         [ color theme.primary
         , cssDark [ color theme.primaryDark ]
@@ -49,31 +67,31 @@ menuLink theme =
         ]
 
 
-menuLinkSelected : Themer.Theme -> Style
-menuLinkSelected theme =
+linkSelectedStyle : Themer.Theme -> Style
+linkSelectedStyle theme =
     Css.batch
-        [ menuLink theme
+        [ linkStyle theme
         , textDecoration underline
         ]
 
 
-menu : Model -> Html Msg
-menu model =
+menu : Props -> Html Msg
+menu { route, theme } =
     let
         link =
-            menuLink model.theme
+            linkStyle theme
 
         selectedLink =
-            menuLinkSelected model.theme
+            linkSelectedStyle theme
     in
     p []
         [ b []
             [ text "u micky" ]
         , text " - "
         , a
-            [ href "articles"
+            [ href "/articles"
             , css
-                [ if model.route == Articles then
+                [ if route == Articles then
                     selectedLink
 
                   else
@@ -83,9 +101,9 @@ menu model =
             [ text "věci" ]
         , text ", "
         , a
-            [ href "about"
+            [ href "/about"
             , css
-                [ if model.route == About then
+                [ if route == About then
                     selectedLink
 
                   else
@@ -96,16 +114,38 @@ menu model =
         ]
 
 
-siteContent : Model -> Html Msg
-siteContent model =
+sectionContent : Props -> Html Msg
+sectionContent props =
     p []
-        [ case model.route of
+        [ case props.route of
             Articles ->
-                text "at articles"
+                articleView props.article
+
+            Article a ->
+                text a
 
             About ->
                 text "Jsem micka a jsem linej pouzivat diakritiku."
 
             E404 ->
                 text "404 ... asi nevim kde jsem"
+        ]
+
+
+articleView : Article -> Html Msg
+articleView article =
+    div []
+        [ p []
+            [ text
+                (case article of
+                    Model.Loading resource ->
+                        "Loading: " ++ resource
+
+                    Model.Ready content ->
+                        content
+
+                    Model.Error ->
+                        "Nepovedlo se mi nacist prispevek. Sorry O.O"
+                )
+            ]
         ]

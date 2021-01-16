@@ -1,22 +1,23 @@
 module Router exposing (routeByString, routeByUrl)
 
-import Models exposing (Route(..))
+import Model exposing (Route(..))
 import Url
-import Url.Parser
+import Url.Parser exposing ((</>), Parser, map, oneOf, parse, s, string, top)
 
 
-routeParser : Url.Parser.Parser (Route -> a) a
+routeParser : Parser (Route -> a) a
 routeParser =
-    Url.Parser.oneOf
-        [ Url.Parser.map Articles (Url.Parser.s "articles")
-        , Url.Parser.map About (Url.Parser.s "about")
-        , Url.Parser.map Articles Url.Parser.top
+    oneOf
+        [ map Article (s "articles" </> string)
+        , map Articles (s "articles")
+        , map About (s "about")
+        , map Articles top
         ]
 
 
 routeByUrl : Url.Url -> Route
 routeByUrl url =
-    case Url.Parser.parse routeParser url of
+    case parse routeParser url of
         Nothing ->
             E404
 

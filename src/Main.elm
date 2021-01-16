@@ -3,7 +3,8 @@ module Main exposing (main)
 import Browser
 import Browser.Navigation as Nav
 import Html.Styled exposing (..)
-import Models exposing (Model, Msg(..), Route(..))
+import Http
+import Model exposing (Article, Model, Msg(..), Route(..))
 import Router exposing (routeByString, routeByUrl)
 import Task
 import Themer exposing (initTheme, updateTheme)
@@ -34,19 +35,65 @@ main =
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key =
+    let
+        route =
+            routeByUrl url
+    in
     ( Model
         key
-        (routeByUrl url)
+        route
         initTheme
+        Nothing
+        (Model.Loading (routeToResourceName route))
         Time.utc
         (Time.millisToPosix 0)
-    , Task.perform AdjustTimeZone Time.here
+    , Cmd.batch
+        ([ Task.perform SetTimeZone Time.here
+         , Task.perform Tick Time.now
+         ]
+            ++ routeChangedActions (routeByUrl url)
+        )
     )
+
+
+routeToResourceName : Route -> String
+routeToResourceName route =
+    case route of
+        Articles ->
+            "articles"
+
+        Article a ->
+            a
+
+        About ->
+            "about"
+
+        E404 ->
+            "error"
 
 
 
 -- UPDATE
--- TODO: move to Controller.elm
+
+
+routeChangedActions : Route -> List (Cmd Msg)
+routeChangedActions route =
+    case route of
+        Articles ->
+            [ Http.get
+                { url = "/articles.txt"
+                , expect = Http.expectString SetArticle
+                }
+            ]
+
+        Article _ ->
+            []
+
+        About ->
+            []
+
+        E404 ->
+            []
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -65,8 +112,15 @@ update msg model =
                     )
 
         UrlChanged url ->
-            ( { model | route = routeByUrl url }
-            , Cmd.none
+            let
+                route =
+                    routeByUrl url
+            in
+            ( { model
+                | article = Model.Loading (routeToResourceName route)
+                , route = route
+              }
+            , Cmd.batch (routeChangedActions route)
             )
 
         Tick now ->
@@ -77,11 +131,31 @@ update msg model =
             , Cmd.none
             )
 
-        AdjustTimeZone zone ->
+        SetTimeZone zone ->
             ( { model
                 | zone = zone
               }
-            , Task.perform Tick Time.now
+            , Cmd.none
+            )
+
+        SetArticle result ->
+            ( { model
+                | article =
+                    case result of
+                        Ok content ->
+                            Model.Ready content
+
+                        Err _ ->
+                            Model.Error
+                , content =
+                    case result of
+                        Ok asdf ->
+                            Just asdf
+
+                        Err _ ->
+                            Nothing
+              }
+            , Cmd.none
             )
 
 
