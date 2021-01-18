@@ -43,7 +43,6 @@ init flags url key =
         key
         route
         initTheme
-        Nothing
         (Model.Loading (routeToResourceName route))
         Time.utc
         (Time.millisToPosix 0)
@@ -81,7 +80,7 @@ routeChangedActions route =
     case route of
         Articles ->
             [ Http.get
-                { url = "/articles.txt"
+                { url = "/articles.md"
                 , expect = Http.expectString SetArticle
                 }
             ]
@@ -147,13 +146,6 @@ update msg model =
 
                         Err _ ->
                             Model.Error
-                , content =
-                    case result of
-                        Ok asdf ->
-                            Just asdf
-
-                        Err _ ->
-                            Nothing
               }
             , Cmd.none
             )

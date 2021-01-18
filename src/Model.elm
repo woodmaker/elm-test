@@ -20,7 +20,6 @@ type alias Model =
     { key : Browser.Navigation.Key
     , route : Route
     , theme : Theme
-    , content : Maybe String
     , article : Article
     , zone : Time.Zone
     , time : Time.Posix

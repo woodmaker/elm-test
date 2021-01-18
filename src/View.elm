@@ -7,13 +7,13 @@ import Html.Lazy exposing (lazy)
 import Html.Styled exposing (..)
 import Html.Styled.Attributes exposing (css, href)
 import Model exposing (Article, Model, Msg, Route(..))
+import String exposing (join, lines)
 import Themer exposing (Theme)
 
 
 type alias Props =
     { route : Route
     , theme : Theme
-    , content : Maybe String
     , article : Article
     }
 
@@ -23,7 +23,6 @@ view model =
     browserApp
         { route = model.route
         , theme = model.theme
-        , content = model.content
         , article = model.article
         }
 
@@ -119,7 +118,7 @@ sectionContent props =
     p []
         [ case props.route of
             Articles ->
-                articleView props.article
+                articleView props.article props.theme
 
             Article a ->
                 text a
@@ -132,20 +131,58 @@ sectionContent props =
         ]
 
 
-articleView : Article -> Html Msg
-articleView article =
+articleView : Article -> Theme -> Html Msg
+articleView article theme =
     div []
         [ p []
-            [ text
-                (case article of
-                    Model.Loading resource ->
-                        "Loading: " ++ resource
+            (case article of
+                Model.Loading resource ->
+                    [ text ("Loading: " ++ resource) ]
 
-                    Model.Ready content ->
-                        content
+                Model.Ready content ->
+                    mdToElements content theme
 
-                    Model.Error ->
-                        "Nepovedlo se mi nacist prispevek. Sorry O.O"
-                )
-            ]
+                Model.Error ->
+                    [ text ("Nepovedlo se mi nacist prispevek. Sorry O.O") ]
+
+            )
         ]
+
+mdToElements : String -> Theme -> List (Html Msg)
+mdToElements markdownText theme =
+    List.map strlToP (mdElements markdownText)
+
+strlToP : List(String) -> Html Msg
+strlToP lines =
+    p [] [ text (join " " lines) ]
+
+
+--- we read md file line by line
+--- mdElement is list of lines with empty line around
+
+mdElements : String -> List(List(String))
+mdElements markdownText =
+    mdElementsX (lines markdownText) []
+
+
+mdElementsX : List(String) -> List(String) -> List(List(String))
+mdElementsX unparsedLines currentLines =
+    case unparsedLines of
+        line :: restOfLines ->
+            case line of
+                "" ->
+                    case currentLines of
+                        [] ->
+                            mdElementsX restOfLines []
+                        _ ->
+                            currentLines :: mdElementsX restOfLines []
+
+                _ ->
+                    mdElementsX restOfLines (currentLines ++ [line])
+        [] ->
+                    case currentLines of
+                        [] ->
+                            []
+                        _ ->
+                            [currentLines]
+
